@@ -21,14 +21,14 @@ staticBoomArm = [
     [CANVAS_MID_X - 7, CANVAS_MID_Y - 20],
 ]
 
-vertice = [
+vertices = [
     [CANVAS_MID_X - SIDE/2, CANVAS_MID_Y - SIDE/2],
     [CANVAS_MID_X + SIDE/2, CANVAS_MID_Y - SIDE/2],
     [CANVAS_MID_X + SIDE/2, CANVAS_MID_Y + SIDE/2],
     [CANVAS_MID_X - SIDE/2, CANVAS_MID_Y + SIDE/2],
 ]
 
-vertices = [
+vertice = [
     [CANVAS_MID_X - SIDE/5, CANVAS_MID_Y - SIDE/6],
     [CANVAS_MID_X + SIDE/6, CANVAS_MID_Y - SIDE/3],
     [CANVAS_MID_X + SIDE/5, CANVAS_MID_Y + SIDE/2],
