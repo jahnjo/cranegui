@@ -14,6 +14,7 @@ inclY = -20
 deg = 0
 backIncX = True
 backIncY = True
+polyColor = "green"
 
 root = Tk()
 canvas = Canvas(root, bg="white", height=HEIGHT, width=WIDTH)
@@ -34,6 +35,17 @@ vertice = [
     [CANVAS_MID_X + SIDE/5, CANVAS_MID_Y + SIDE/2],
     [CANVAS_MID_X - SIDE/3, CANVAS_MID_Y + SIDE/6],
 ]
+
+def polygonColors(inclX, inclY):
+    global polyColor
+    if inclX > 14 or inclX < -14 or inclY > 14 or inclY < -14:
+        polyColor = "red"
+    elif inclX > 7 or inclX < -7 or inclY > 7 or inclY < -7:
+        polyColor = "yellow"
+    elif inclX < 7 or inclX > -7 or inclY < 7 or inclY > -7:
+        polyColor = "green"
+    return polyColor
+
 
 def sensorInput(SIDE, midx, midy, orExtR, orExtL, inclX, inclY):
     vertices = [
@@ -133,12 +145,14 @@ def rotate(points, angle, center):
         new_points.append([x_new + cx, y_new + cy])
     return new_points
 
-def draw_square(points, color="white"):
-    canvas.create_polygon(points, fill=color, outline='black')
+def draw_square(points, polyColor):
+    canvas.create_polygon(points, fill=polyColor, outline='black')
 
 def rotateAndDraw(rotDeg, basePoints, inclX, inclY):
     #rewriting canvas
     canvas.delete("all")
+
+    polyColor = polygonColors(inclX, inclY)
 
     #establishing center
     center = (CANVAS_MID_X, CANVAS_MID_Y)
@@ -151,7 +165,7 @@ def rotateAndDraw(rotDeg, basePoints, inclX, inclY):
     cornerPts = rotate(cornerSq, rotDeg, center)
 
     #draw square
-    draw_square(newSquare)
+    draw_square(newSquare, polyColor)
 
     #draw degrees in center
     canvas.create_text((77,170),fill="black",font="Courier 20",text="Degrees:")
@@ -171,10 +185,10 @@ def rotateAndDraw(rotDeg, basePoints, inclX, inclY):
 
 
     #draw corner numbers
-    '''canvas.create_text(cornerPts[0],fill="red",font="Courier 30",text=inclY)
+    canvas.create_text(cornerPts[0],fill="red",font="Courier 30",text=inclY)
     canvas.create_text(cornerPts[1],fill="red",font="Courier 30",text=inclY)
     canvas.create_text(cornerPts[2],fill="blue",font="Courier 30",text=inclX)
-    canvas.create_text(cornerPts[3],fill="blue",font="Courier 30",text=inclX)'''
+    canvas.create_text(cornerPts[3],fill="blue",font="Courier 30",text=inclX)
 
     #draw boom arm
     canvas.create_polygon(staticBoomArm, fill='white', outline='black')
