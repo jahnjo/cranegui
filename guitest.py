@@ -158,10 +158,10 @@ def rotateAndDraw(rotDeg, basePoints, inclX, inclY):
     canvas.create_text((195,170),fill="black",font="Courier 20",text=rotDeg)
 
     #draw incline degrees
-    canvas.create_text((100,50),fill="black",font="Courier 20",text="Incline X: ")
-    canvas.create_text((195,50),fill="black",font="Courier 20",text=inclX)
-    canvas.create_text((100,80),fill="black",font="Courier 20",text="Incline Y: ")
-    canvas.create_text((195,80),fill="black",font="Courier 20",text=inclY)
+    #canvas.create_text((100,50),fill="black",font="Courier 20",text="Incline X: ")
+    #canvas.create_text((195,50),fill="black",font="Courier 20",text=inclX)
+    #canvas.create_text((100,80),fill="black",font="Courier 20",text="Incline Y: ")
+    #canvas.create_text((195,80),fill="black",font="Courier 20",text=inclY)
 
     #draw outrigger positions
     canvas.create_text((85,110),fill="black",font="Courier 20",text="OR Right:")
@@ -171,16 +171,16 @@ def rotateAndDraw(rotDeg, basePoints, inclX, inclY):
 
 
     #draw corner numbers
-    canvas.create_text(cornerPts[0],fill="red",font="Courier 30",text='1')
-    canvas.create_text(cornerPts[1],fill="red",font="Courier 30",text='2')
-    canvas.create_text(cornerPts[2],fill="blue",font="Courier 30",text='3')
-    canvas.create_text(cornerPts[3],fill="blue",font="Courier 30",text='4')
+    '''canvas.create_text(cornerPts[0],fill="red",font="Courier 30",text=inclY)
+    canvas.create_text(cornerPts[1],fill="red",font="Courier 30",text=inclY)
+    canvas.create_text(cornerPts[2],fill="blue",font="Courier 30",text=inclX)
+    canvas.create_text(cornerPts[3],fill="blue",font="Courier 30",text=inclX)'''
 
     #draw boom arm
     canvas.create_polygon(staticBoomArm, fill='white', outline='black')
 
 def clock():
-    incrementDeg()
+    #incrementDeg()
     #incrementOr()
     incrementInclineX()
     incrementInclineY()
