@@ -1,5 +1,7 @@
 # cranegui
 
+In order to use Tkinter within python 2 run ```sudo [packman] install python-tkinter```
+
 Dependencies for Labjack
 
 Files Needed:
