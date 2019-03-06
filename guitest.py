@@ -273,7 +273,7 @@ def rotateAndDraw(rotDeg, basePoints, inclX, inclY, midx, midy, boomAngle):
 
 def clock():
     #all increment functions simulate sensor input
-    #incrementDeg()
+    incrementDeg()
     #incrementOr()
     #incrementInclineX()
     #incrementInclineY()
