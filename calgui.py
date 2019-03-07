@@ -10,9 +10,15 @@ Inputs:
 
 
 from Tkinter import *
+from PIL import ImageTk, Image
 import math
 import datetime
 import u6
+import threading
+from evdev import InputDevice, categorize, ecodes
+
+debugMode = True
+
 
 
 #DAQ = u6.U6()
@@ -59,6 +65,8 @@ slewAngle = 0
 boomAngle = 0
 boomExtension = 0
 
+POL = 10
+
 backIncX = True
 backIncY = True
 backBoom = True
@@ -66,7 +74,70 @@ polyColor = "green"
 
 root = Tk()
 canvas = Canvas(root, bg="white", height=HEIGHT, width=WIDTH)
-canvas.pack(fill=BOTH, expand=1)
+canvas.pack()
+
+def getKeyboardInput():
+    global debugMode
+    global POL
+    device = InputDevice("/dev/input/event19")
+    device.grab()
+    for event in device.read_loop():
+        if event.code == ecodes.KEY_1:
+            print "debugMode True"
+            debugMode = True
+        elif event.code == ecodes.KEY_5:
+            print "debugMode False"
+            debugMode = False
+        elif event.code == ecodes.KEY_8:
+            print "Exiting userInputThread"
+            device.ungrab()
+            return 0
+
+        if event.code == ecodes.KEY_2:
+            if POL > 10:
+                POL = 10
+            else:
+                POL += 0.5
+        elif event.code == ecodes.KEY_6:
+            if POL < 0:
+                POL = 0
+            else:
+                POL -= 0.5
+        
+
+def partsOfLine():
+    canvas.create_text((750,433),fill="black",font="Courier 20",text=int(POL))
+
+def getImages():
+    imageList = []
+
+    temp = Image.open(".//images//L.png")
+    temp = temp.resize((63,48))
+    imageList.append(ImageTk.PhotoImage(temp))
+
+    temp = Image.open(".//images//W.png")
+    temp = temp.resize((65,56))
+    imageList.append(ImageTk.PhotoImage(temp))
+
+    imageList.append(ImageTk.PhotoImage(Image.open(".//images//act.png")))
+
+    imageList.append(ImageTk.PhotoImage(Image.open(".//images//max.png")))
+
+    temp = Image.open(".//images//R.png")
+    temp = temp.resize((60,48))
+    imageList.append(ImageTk.PhotoImage(temp))
+
+    temp = Image.open(".//images//A.png")
+    temp = temp.resize((60,47))
+    imageList.append(ImageTk.PhotoImage(temp))
+
+    imageList.append(ImageTk.PhotoImage(Image.open(".//images//SPL.png")))
+
+    imageList.append(ImageTk.PhotoImage(Image.open(".//images//Tubelock.png")))
+
+    imageList.append(ImageTk.PhotoImage(Image.open(".//images//POL.png")))
+
+    return imageList
 
 def calibrateIncline(incline):
     calibratedVal = (incline / 0.125) - 20
@@ -260,7 +331,7 @@ def draw_square(points, polyColor):
     canvas.create_polygon(points, fill=polyColor, outline='black')
 
 def draw_bg():
-    leftWindow = [[5,5],[600,5],[600,475],[5,475]]
+    
     one = [[605,5],[800,5],[800,55],[605,55]]
     two = [[605,60],[800,60],[800,110],[605,110]]
     three = [[605,115],[800,115],[800,165],[605,165]]
@@ -271,10 +342,6 @@ def draw_bg():
     eight = [[605,390],[697,390],[697,475],[605,475]]
     nine = [[702,390],[800,390],[800,475],[702,475]]
 
-
-    
-
-    canvas.create_polygon(leftWindow, fill='white', outline='black')
     canvas.create_polygon(one, fill='white', outline='black')
     canvas.create_polygon(two, fill='white', outline='black')
     canvas.create_polygon(three, fill='white', outline='black')
@@ -285,15 +352,26 @@ def draw_bg():
     canvas.create_polygon(eight, fill='white', outline='black')
     canvas.create_polygon(nine, fill='white', outline='black')
 
-
-    
-
+    #temp = Image.open("L.png")
+    #L = ImageTk.PhotoImage(Image.open("L.png"))
+    #canvas.create_image((100,100),image=L)
+    canvas.create_image((643,30),image=imageList[0])
+    canvas.create_image((643,90),image=imageList[1])
+    canvas.create_image((643,140),image=imageList[2])
+    canvas.create_image((643,204),image=imageList[3])
+    canvas.create_image((643,250),image=imageList[4])
+    canvas.create_image((643,305),image=imageList[5])
+    canvas.create_image((643,367),image=imageList[6])
+    canvas.create_image((651,433),image=imageList[7])
+    canvas.create_image((750,433),image=imageList[8])
 
 def rotateAndDraw(slewAngle, basePoints, inclX, inclY, midx, midy, boomAngle, boomExtension):
+    global debugMode
     #rewriting canvas
     canvas.delete("all")
 
-    draw_bg()
+    leftWindow = [[5,5],[600,5],[600,475],[5,475]]
+    canvas.create_polygon(leftWindow, fill='white', outline='black')
 
     #coloring the polygon based on the incline
     #polyColor = polygonColors(inclX, inclY)
@@ -321,28 +399,32 @@ def rotateAndDraw(slewAngle, basePoints, inclX, inclY, midx, midy, boomAngle, bo
     #draw square
     draw_square(newSquare, polyColor)
 
-    #draw degrees in center
-    canvas.create_text((43,170),fill="black",font="Courier 20",text="DEG:")
-    canvas.create_text((120,170),fill="black",font="Courier 20",text=str(round(slewAngle,2)))
+    if debugMode:
 
-    #draw incline degrees
-    canvas.create_text((50,50),fill="black",font="Courier 20",text="ROL: ")
-    canvas.create_text((120,50),fill="black",font="Courier 20",text=str(round(inclX,2)))
-    canvas.create_text((50,80),fill="black",font="Courier 20",text="PIT: ")
-    canvas.create_text((120,80),fill="black",font="Courier 20",text=str(round(inclY,2)))
+        #draw degrees
+        canvas.create_text((43,170),fill="black",font="Courier 20",text="DEG:")
+        canvas.create_text((120,170),fill="black",font="Courier 20",text=str(round(slewAngle,2)))
 
-    #draw outrigger positions
-    canvas.create_text((50,110),fill="black",font="Courier 20",text="ORR: ")
-    canvas.create_text((120,110),fill="black",font="Courier 20",text=str(round(outriggerExtRight,2)))
-    canvas.create_text((50,140),fill="black",font="Courier 20",text="ORL: ")
-    canvas.create_text((120,140),fill="black",font="Courier 20",text=str(round(outriggerExtLeft,2)))
+        #draw incline degrees
+        canvas.create_text((50,50),fill="black",font="Courier 20",text="ROL: ")
+        canvas.create_text((120,50),fill="black",font="Courier 20",text=str(round(inclX,2)))
+        canvas.create_text((50,80),fill="black",font="Courier 20",text="PIT: ")
+        canvas.create_text((120,80),fill="black",font="Courier 20",text=str(round(inclY,2)))
 
-    #draw boom angle and extension
-    canvas.create_text((43,200),fill="black",font="Courier 20",text="BAN:")
-    canvas.create_text((120,200),fill="black",font="Courier 20",text=str(round(boomAngle,2)))
-    canvas.create_text((50,230),fill="black",font="Courier 20",text="BEX: ")
-    canvas.create_text((120,230),fill="black",font="Courier 20",text=str(round(boomExtension,2)))
+        #draw outrigger positions
+        canvas.create_text((50,110),fill="black",font="Courier 20",text="ORR: ")
+        canvas.create_text((120,110),fill="black",font="Courier 20",text=str(round(outriggerExtRight,2)))
+        canvas.create_text((50,140),fill="black",font="Courier 20",text="ORL: ")
+        canvas.create_text((120,140),fill="black",font="Courier 20",text=str(round(outriggerExtLeft,2)))
 
+        #draw boom angle and extension
+        canvas.create_text((43,200),fill="black",font="Courier 20",text="BAN:")
+        canvas.create_text((120,200),fill="black",font="Courier 20",text=str(round(boomAngle,2)))
+        canvas.create_text((50,230),fill="black",font="Courier 20",text="BEX: ")
+        canvas.create_text((120,230),fill="black",font="Courier 20",text=str(round(boomExtension,2)))
+
+    elif not debugMode:
+        canvas.create_text((43,170),fill="black",font="Courier 20",text="LOL")
 
     #draw corner numbers either , 1-4, or incline values (still under dev)
     #canvas.create_text(cornerPts[0],fill=colorY,font="Courier 30",text=str(round(inclY,2)))
@@ -353,7 +435,9 @@ def rotateAndDraw(slewAngle, basePoints, inclX, inclY, midx, midy, boomAngle, bo
     #draw boom arm
     staticBoomArm = adjustBoom(midx, midy, boomAngle,boomExtension)
     canvas.create_polygon(staticBoomArm, fill='white', outline='black')
-
+    draw_bg()
+    partsOfLine()
+    
 def clock():
     global pitch
     global roll
@@ -386,14 +470,18 @@ def clock():
     boomExtension = calibrateBoomExtension(test1)
     boomAngle = calibrateBoomAngle(test2)
     '''
+
     drawingPts = sensorInput(craneLength, craneWidth, CANVAS_MID_X, CANVAS_MID_Y, outriggerExtRight, outriggerExtLeft, pitch, roll)   
     rotateAndDraw(slewAngle, drawingPts, pitch, roll, CANVAS_MID_X, CANVAS_MID_Y, boomAngle, boomExtension)
     
+    
 
     #50, running at 20 Hz
-    root.after(50, clock) # run itself again after 50 ms
+    root.after(100, clock) # run itself again after 50 ms
 
+userInputThread = threading.Thread(target=getKeyboardInput, args=())
+userInputThread.start()
 
-
+imageList = getImages()
 clock()
 root.mainloop()
