@@ -67,6 +67,13 @@ boomExtension = 0
 
 POL = 10
 
+WisH = 0
+ACT = 0
+MAX = 0
+R = 0
+SPL = 25000
+TL = 0
+
 backIncX = True
 backIncY = True
 backBoom = True
@@ -104,9 +111,16 @@ def getKeyboardInput():
             else:
                 POL -= 0.5
         
-
-def partsOfLine():
+def populateRight():
+    canvas.create_text((750,36),fill="black",font="Courier 20",text=int(boomExtension))
+    canvas.create_text((750,90),fill="black",font="Courier 20",text=int(WisH))
+    canvas.create_text((750,145),fill="black",font="Courier 20",text=int(ACT))
+    canvas.create_text((750,200),fill="black",font="Courier 20",text=int(MAX))
+    canvas.create_text((750,255),fill="black",font="Courier 20",text=int(R))
+    canvas.create_text((750,310),fill="black",font="Courier 20",text=int(boomAngle))
+    canvas.create_text((750,365),fill="black",font="Courier 20",text=int(SPL))
     canvas.create_text((750,433),fill="black",font="Courier 20",text=int(POL))
+    
 
 def getImages():
     imageList = []
@@ -352,9 +366,6 @@ def draw_bg():
     canvas.create_polygon(eight, fill='white', outline='black')
     canvas.create_polygon(nine, fill='white', outline='black')
 
-    #temp = Image.open("L.png")
-    #L = ImageTk.PhotoImage(Image.open("L.png"))
-    #canvas.create_image((100,100),image=L)
     canvas.create_image((643,30),image=imageList[0])
     canvas.create_image((643,90),image=imageList[1])
     canvas.create_image((643,140),image=imageList[2])
@@ -436,7 +447,7 @@ def rotateAndDraw(slewAngle, basePoints, inclX, inclY, midx, midy, boomAngle, bo
     staticBoomArm = adjustBoom(midx, midy, boomAngle,boomExtension)
     canvas.create_polygon(staticBoomArm, fill='white', outline='black')
     draw_bg()
-    partsOfLine()
+    populateRight()
     
 def clock():
     global pitch
@@ -479,8 +490,8 @@ def clock():
     #50, running at 20 Hz
     root.after(100, clock) # run itself again after 50 ms
 
-userInputThread = threading.Thread(target=getKeyboardInput, args=())
-userInputThread.start()
+#userInputThread = threading.Thread(target=getKeyboardInput, args=())
+#userInputThread.start()
 
 imageList = getImages()
 clock()
