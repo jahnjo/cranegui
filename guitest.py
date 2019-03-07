@@ -13,9 +13,9 @@ from Tkinter import *
 import math
 import datetime
 
-WIDTH = 1200
-HEIGHT = 800
-CANVAS_MID_X = WIDTH/2
+WIDTH = 800
+HEIGHT = 480
+CANVAS_MID_X = WIDTH/2.5
 CANVAS_MID_Y = HEIGHT/2
 SIDE = 400
 
@@ -24,7 +24,7 @@ Crane length is 22'7" and the width (no outrigger extension) is 12'
 so the width is shorter by a factor of 1.8816. The outriggers extended
 fully makes the width 17.8'. 
 '''
-craneLength = 400
+craneLength = 200
 craneWidth = craneLength / 1.8816
 
 '''
@@ -35,6 +35,20 @@ inch needs to be recalculated) described by the outriggerMod.
 outriggerExtRight = 0
 outriggerExtLeft = 0
 outriggerMod = 1.476
+
+leftWindow = [
+    [5,5],
+    [600,5],
+    [600,475],
+    [5,475]
+]
+
+rightWindow = [
+    [605,5],
+    [795,5],
+    [795,475],
+    [605,475]
+]
 
 inclX = 0
 inclY = 0
@@ -54,8 +68,8 @@ canvas.pack(fill=BOTH, expand=1)
 
 def adjustBoom(midx, midy, boomAngle):
     boomPoints = [
-        [CANVAS_MID_X - 7, CANVAS_MID_Y - 350 + (boomAngle*2.5)],
-        [CANVAS_MID_X + 7, CANVAS_MID_Y - 350 + (boomAngle*2.5)],
+        [CANVAS_MID_X - 7, CANVAS_MID_Y - 175 + (boomAngle*2.5)],
+        [CANVAS_MID_X + 7, CANVAS_MID_Y - 175 + (boomAngle*2.5)],
         [CANVAS_MID_X + 7, CANVAS_MID_Y - 20],
         [CANVAS_MID_X - 7, CANVAS_MID_Y - 20],
     ]
@@ -83,15 +97,6 @@ def colors(number):
 
 #Very important, takes in sensor values and modifies the shape of the polygon
 #based on outrigger pos and inclinometer x/y.
-'''def sensorInput(SIDE, midx, midy, orExtR, orExtL, inclX, inclY):
-    vertices = [
-        [CANVAS_MID_X - SIDE/2 - (orExtL*3) - (inclY*3), CANVAS_MID_Y - SIDE/2 + (inclX*3)],
-        [CANVAS_MID_X + SIDE/2 + (orExtR*3) + (inclY*3), CANVAS_MID_Y - SIDE/2 - (inclX*3)],
-        [CANVAS_MID_X + SIDE/2 + (orExtR*3) - (inclY*3), CANVAS_MID_Y + SIDE/2 + (inclX*3)],
-        [CANVAS_MID_X - SIDE/2 - (orExtL*3) + (inclY*3), CANVAS_MID_Y + SIDE/2 - (inclX*3)],
-    ]
-    return vertices'''
-
 def sensorInput(craneLength, craneWidth, midx, midy, orExtR, orExtL, inclX, inclY):
     vertices = [
         [CANVAS_MID_X - craneWidth/2 - (orExtL*outriggerMod) - (inclY*3), CANVAS_MID_Y - craneLength/2 + (inclX*3)],
@@ -210,8 +215,12 @@ def draw_square(points, polyColor):
     canvas.create_polygon(points, fill=polyColor, outline='black')
 
 def rotateAndDraw(rotDeg, basePoints, inclX, inclY, midx, midy, boomAngle):
+    
     #rewriting canvas
     canvas.delete("all")
+
+    canvas.create_polygon(leftWindow, fill='white', outline='black')
+    canvas.create_polygon(rightWindow, fill='white', outline='black')
 
     #coloring the polygon based on the incline
     #polyColor = polygonColors(inclX, inclY)
@@ -239,41 +248,43 @@ def rotateAndDraw(rotDeg, basePoints, inclX, inclY, midx, midy, boomAngle):
     #draw square
     draw_square(newSquare, polyColor)
 
-    #draw degrees in center
-    canvas.create_text((82,170),fill="black",font="Courier 20",text="Degrees:")
-    canvas.create_text((195,170),fill="black",font="Courier 20",text=rotDeg)
-
-    #draw incline degrees
-    canvas.create_text((100,50),fill="black",font="Courier 20",text="Incline X: ")
-    canvas.create_text((195,50),fill="black",font="Courier 20",text=inclX)
-    canvas.create_text((100,80),fill="black",font="Courier 20",text="Incline Y: ")
-    canvas.create_text((195,80),fill="black",font="Courier 20",text=inclY)
-
-    #draw outrigger positions
-    canvas.create_text((88,110),fill="black",font="Courier 20",text="OR Right:")
-    canvas.create_text((195,110),fill="black",font="Courier 20",text=outriggerExtRight)
-    canvas.create_text((88,140),fill="black",font="Courier 20",text="OR Left: ")
-    canvas.create_text((195,140),fill="black",font="Courier 20",text=outriggerExtLeft)
-
-
-    #draw corner numbers either , 1-4, or incline values (still under dev)
-    canvas.create_text(cornerPts[0],fill=colorY,font="Courier 30",text=inclY)
-    canvas.create_text(cornerPts[1],fill=colorX,font="Courier 30",text=inclX)
-    canvas.create_text(cornerPts[2],fill=colorX,font="Courier 30",text=inclX)
-    canvas.create_text(cornerPts[3],fill=colorY,font="Courier 30",text=inclY)
-
-    '''canvas.create_text(cornerPts[0],fill=colorY,font="Courier 30",text="1")
-    canvas.create_text(cornerPts[1],fill=colorX,font="Courier 30",text="2")
-    canvas.create_text(cornerPts[2],fill=colorX,font="Courier 30",text="3")
-    canvas.create_text(cornerPts[3],fill=colorY,font="Courier 30",text="4")'''
-
-    #draw boom arm
     staticBoomArm = adjustBoom(midx, midy, boomAngle)
     canvas.create_polygon(staticBoomArm, fill='white', outline='black')
 
+
+    #draw degrees in center
+    canvas.create_text((82,170),fill="black",font="Courier 20",text="DEG:")
+    canvas.create_text((195,170),fill="black",font="Courier 20",text=rotDeg)
+
+    #draw incline degrees
+    canvas.create_text((100,50),fill="black",font="Courier 20",text="PCH: ")
+    canvas.create_text((195,50),fill="black",font="Courier 20",text=inclX)
+    canvas.create_text((100,80),fill="black",font="Courier 20",text="ROL: ")
+    canvas.create_text((195,80),fill="black",font="Courier 20",text=inclY)
+
+    #draw outrigger positions
+    canvas.create_text((88,110),fill="black",font="Courier 20",text="ORR:")
+    canvas.create_text((195,110),fill="black",font="Courier 20",text=outriggerExtRight)
+    canvas.create_text((88,140),fill="black",font="Courier 20",text="ORL: ")
+    canvas.create_text((195,140),fill="black",font="Courier 20",text=outriggerExtLeft)
+
+    canvas.create_text((88,200),fill="black",font="Courier 20",text="BAN:")
+    canvas.create_text((230,200),fill="black",font="Courier 20",text=str(round(boomAngle,2)))
+    canvas.create_text((88,230),fill="black",font="Courier 20",text="BEX: ")
+    canvas.create_text((230,230),fill="black",font="Courier 20",text=str(round(boomExtension,2)))
+
+'''
+    #draw corner numbers either , 1-4, or incline values (still under dev)
+    canvas.create_text(cornerPts[0],fill=colorY,font="Courier 30",text="1")
+    canvas.create_text(cornerPts[1],fill=colorX,font="Courier 30",text="2")
+    canvas.create_text(cornerPts[2],fill=colorX,font="Courier 30",text="3")
+    canvas.create_text(cornerPts[3],fill=colorY,font="Courier 30",text="4")
+'''
+    
+
 def clock():
     #all increment functions simulate sensor input
-    incrementDeg()
+    #incrementDeg()
     #incrementOr()
     #incrementInclineX()
     #incrementInclineY()

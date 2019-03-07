@@ -14,24 +14,24 @@ import math
 import datetime
 import u6
 
-DAQ = u6.U6()
+
+#DAQ = u6.U6()
 
 
-
-
-
-WIDTH = 1200
-HEIGHT = 800
-CANVAS_MID_X = WIDTH/2
+WIDTH = 800
+HEIGHT = 480
+CANVAS_MID_X = WIDTH/2.5
 CANVAS_MID_Y = HEIGHT/2
 SIDE = 400
+
+
 
 '''
 Crane length is 22'7" and the width (no outrigger extension) is 12'
 so the width is shorter by a factor of 1.8816. The outriggers extended
 fully makes the width 17.8'. 
 '''
-craneLength = 400
+craneLength = 200
 craneWidth = craneLength / 1.8816
 
 '''
@@ -108,8 +108,6 @@ def calibrateBoomExtension(boomExtension):
         calibratedVal = 54
     return calibratedVal
 
-
-
 def adjustBoom(midx, midy, boomAngle, boomExtension):
     defaultBoomExt = 26
     radAngle = math.radians(boomAngle)
@@ -144,21 +142,12 @@ def colors(number):
 
 #Very important, takes in sensor values and modifies the shape of the polygon
 #based on outrigger pos and inclinometer x/y.
-'''def sensorInput(SIDE, midx, midy, orExtR, orExtL, inclX, inclY):
+def sensorInput(craneLength, craneWidth, midx, midy, orExtR, orExtL, pitch, roll):
     vertices = [
-        [CANVAS_MID_X - SIDE/2 - (orExtL*3) - (inclY*3), CANVAS_MID_Y - SIDE/2 + (inclX*3)],
-        [CANVAS_MID_X + SIDE/2 + (orExtR*3) + (inclY*3), CANVAS_MID_Y - SIDE/2 - (inclX*3)],
-        [CANVAS_MID_X + SIDE/2 + (orExtR*3) - (inclY*3), CANVAS_MID_Y + SIDE/2 + (inclX*3)],
-        [CANVAS_MID_X - SIDE/2 - (orExtL*3) + (inclY*3), CANVAS_MID_Y + SIDE/2 - (inclX*3)],
-    ]
-    return vertices'''
-
-def sensorInput(craneLength, craneWidth, midx, midy, orExtR, orExtL, inclX, inclY):
-    vertices = [
-        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) - (inclY*3), CANVAS_MID_Y - craneLength/2 + (inclX*3)],
-        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) + (inclY*3), CANVAS_MID_Y - craneLength/2 - (inclX*3)],
-        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) - (inclY*3), CANVAS_MID_Y + craneLength/2 + (inclX*3)],
-        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) + (inclY*3), CANVAS_MID_Y + craneLength/2 - (inclX*3)],
+        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) - (roll*3), CANVAS_MID_Y - craneLength/2 + (pitch*3)],
+        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) + (roll*3), CANVAS_MID_Y - craneLength/2 - (pitch*3)],
+        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) - (roll*3), CANVAS_MID_Y + craneLength/2 + (pitch*3)],
+        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) + (roll*3), CANVAS_MID_Y + craneLength/2 - (pitch*3)],
     ]
     return vertices
 
@@ -270,9 +259,41 @@ def rotate(points, angle, center):
 def draw_square(points, polyColor):
     canvas.create_polygon(points, fill=polyColor, outline='black')
 
+def draw_bg():
+    leftWindow = [[5,5],[600,5],[600,475],[5,475]]
+    one = [[605,5],[800,5],[800,55],[605,55]]
+    two = [[605,60],[800,60],[800,110],[605,110]]
+    three = [[605,115],[800,115],[800,165],[605,165]]
+    four = [[605,170],[800,170],[800,220],[605,220]]
+    five = [[605,225],[800,225],[800,275],[605,275]]
+    six = [[605,280],[800,280],[800,330],[605,330]]
+    seven = [[605,335],[800,335],[800,385],[605,385]]
+    eight = [[605,390],[697,390],[697,475],[605,475]]
+    nine = [[702,390],[800,390],[800,475],[702,475]]
+
+
+    
+
+    canvas.create_polygon(leftWindow, fill='white', outline='black')
+    canvas.create_polygon(one, fill='white', outline='black')
+    canvas.create_polygon(two, fill='white', outline='black')
+    canvas.create_polygon(three, fill='white', outline='black')
+    canvas.create_polygon(four, fill='white', outline='black')
+    canvas.create_polygon(five, fill='white', outline='black')
+    canvas.create_polygon(six, fill='white', outline='black')
+    canvas.create_polygon(seven, fill='white', outline='black')
+    canvas.create_polygon(eight, fill='white', outline='black')
+    canvas.create_polygon(nine, fill='white', outline='black')
+
+
+    
+
+
 def rotateAndDraw(slewAngle, basePoints, inclX, inclY, midx, midy, boomAngle, boomExtension):
     #rewriting canvas
     canvas.delete("all")
+
+    draw_bg()
 
     #coloring the polygon based on the incline
     #polyColor = polygonColors(inclX, inclY)
@@ -301,26 +322,26 @@ def rotateAndDraw(slewAngle, basePoints, inclX, inclY, midx, midy, boomAngle, bo
     draw_square(newSquare, polyColor)
 
     #draw degrees in center
-    canvas.create_text((82,170),fill="black",font="Courier 20",text="Degrees:")
-    canvas.create_text((195,170),fill="black",font="Courier 20",text=str(round(slewAngle,2)))
+    canvas.create_text((43,170),fill="black",font="Courier 20",text="DEG:")
+    canvas.create_text((120,170),fill="black",font="Courier 20",text=str(round(slewAngle,2)))
 
     #draw incline degrees
-    canvas.create_text((100,50),fill="black",font="Courier 20",text="Roll: ")
-    canvas.create_text((210,50),fill="black",font="Courier 20",text=str(round(inclX,2)))
-    canvas.create_text((100,80),fill="black",font="Courier 20",text="Pitch: ")
-    canvas.create_text((210,80),fill="black",font="Courier 20",text=str(round(inclY,2)))
+    canvas.create_text((50,50),fill="black",font="Courier 20",text="ROL: ")
+    canvas.create_text((120,50),fill="black",font="Courier 20",text=str(round(inclX,2)))
+    canvas.create_text((50,80),fill="black",font="Courier 20",text="PIT: ")
+    canvas.create_text((120,80),fill="black",font="Courier 20",text=str(round(inclY,2)))
 
     #draw outrigger positions
-    canvas.create_text((88,110),fill="black",font="Courier 20",text="OR Right:")
-    canvas.create_text((195,110),fill="black",font="Courier 20",text=str(round(outriggerExtRight,2)))
-    canvas.create_text((88,140),fill="black",font="Courier 20",text="OR Left: ")
-    canvas.create_text((195,140),fill="black",font="Courier 20",text=str(round(outriggerExtLeft,2)))
+    canvas.create_text((50,110),fill="black",font="Courier 20",text="ORR: ")
+    canvas.create_text((120,110),fill="black",font="Courier 20",text=str(round(outriggerExtRight,2)))
+    canvas.create_text((50,140),fill="black",font="Courier 20",text="ORL: ")
+    canvas.create_text((120,140),fill="black",font="Courier 20",text=str(round(outriggerExtLeft,2)))
 
     #draw boom angle and extension
-    canvas.create_text((88,200),fill="black",font="Courier 20",text="Boom Angle:")
-    canvas.create_text((230,200),fill="black",font="Courier 20",text=str(round(boomAngle,2)))
-    canvas.create_text((88,230),fill="black",font="Courier 20",text="Boom Ext: ")
-    canvas.create_text((230,230),fill="black",font="Courier 20",text=str(round(boomExtension,2)))
+    canvas.create_text((43,200),fill="black",font="Courier 20",text="BAN:")
+    canvas.create_text((120,200),fill="black",font="Courier 20",text=str(round(boomAngle,2)))
+    canvas.create_text((50,230),fill="black",font="Courier 20",text="BEX: ")
+    canvas.create_text((120,230),fill="black",font="Courier 20",text=str(round(boomExtension,2)))
 
 
     #draw corner numbers either , 1-4, or incline values (still under dev)
@@ -328,11 +349,6 @@ def rotateAndDraw(slewAngle, basePoints, inclX, inclY, midx, midy, boomAngle, bo
     #canvas.create_text(cornerPts[1],fill=colorX,font="Courier 30",text=str(round(inclX,2)))
     #canvas.create_text(cornerPts[2],fill=colorX,font="Courier 30",text=str(round(inclX,2)))
     #canvas.create_text(cornerPts[3],fill=colorY,font="Courier 30",text=str(round(inclY,2)))
-
-    '''canvas.create_text(cornerPts[0],fill=colorY,font="Courier 30",text="1")
-    canvas.create_text(cornerPts[1],fill=colorX,font="Courier 30",text="2")
-    canvas.create_text(cornerPts[2],fill=colorX,font="Courier 30",text="3")
-    canvas.create_text(cornerPts[3],fill=colorY,font="Courier 30",text="4")'''
 
     #draw boom arm
     staticBoomArm = adjustBoom(midx, midy, boomAngle,boomExtension)
@@ -353,6 +369,7 @@ def clock():
     #incrementInclineY()
     #incrementBoomAngle()
 
+    '''
     test0 = DAQ.getAIN(0)
     test1 = DAQ.getAIN(1)
     test2 = DAQ.getAIN(2)
@@ -368,12 +385,13 @@ def clock():
     slewAngle = calibrateSlewAngle(test0)
     boomExtension = calibrateBoomExtension(test1)
     boomAngle = calibrateBoomAngle(test2)
-
-    drawingPts = sensorInput(craneLength, craneWidth, CANVAS_MID_X, CANVAS_MID_Y, outriggerExtRight, outriggerExtLeft, roll, pitch)   
+    '''
+    drawingPts = sensorInput(craneLength, craneWidth, CANVAS_MID_X, CANVAS_MID_Y, outriggerExtRight, outriggerExtLeft, pitch, roll)   
     rotateAndDraw(slewAngle, drawingPts, pitch, roll, CANVAS_MID_X, CANVAS_MID_Y, boomAngle, boomExtension)
+    
 
     #50, running at 20 Hz
-    root.after(150, clock) # run itself again after 50 ms
+    root.after(50, clock) # run itself again after 50 ms
 
 
 
