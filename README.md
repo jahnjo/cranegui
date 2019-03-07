@@ -15,5 +15,5 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   -linux drivers for the labjack, which needs libusb. I downloaded libusb and libusb-devel from package manager as a    dependency.
   documention to install exodriver [here](https://labjack.com/support/software/installers/exodriver).
   
-  ```install lib-usb
-  pip install Pillow (PIL, image processing)```
+  ```install lib-usb```
+  ```pip install Pillow (PIL, image processing)```
