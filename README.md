@@ -20,3 +20,7 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   ```pip install Pillow (PIL, image processing)```
   
   check for usb devices: ```python -m evdev.evtest```
+  
+  let all use event in device folder
+  
+  ```chmod a+rw /dev/input/event19```
