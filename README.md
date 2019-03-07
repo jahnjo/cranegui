@@ -16,4 +16,5 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   documention to install exodriver [here](https://labjack.com/support/software/installers/exodriver).
   
   ```install lib-usb```
+  
   ```pip install Pillow (PIL, image processing)```
