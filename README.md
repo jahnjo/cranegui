@@ -1,6 +1,6 @@
 # cranegui
 
-In order to use Tkinter within python 2 run ```sudo [packman] install python-tkinter```
+In order to use Tkinter within python 2 run ```sudo apt-get install python-tkinter```
 
 Dependencies for Labjack
 
@@ -15,7 +15,7 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   -linux drivers for the labjack, which needs libusb. I downloaded libusb and libusb-devel from package manager as a    dependency.
   documention to install exodriver [here](https://labjack.com/support/software/installers/exodriver).
   
-  ```install lib-usb```
+  ```sudo apt-get install libusb-1.0-0-dev```
   
   ```pip install Pillow (PIL, image processing)```
   
