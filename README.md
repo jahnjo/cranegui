@@ -19,7 +19,7 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   
   ```pip install Pillow (PIL, image processing)```
   
-  '''pip install numpy'''
+  ```pip install numpy```
   
   check for usb devices: ```python -m evdev.evtest```
   
