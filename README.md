@@ -26,3 +26,13 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   let all use event in device folder
   
   ```chmod a+rw /dev/input/event19```
+
+  In order to get auto boot after gui starts:
+
+  Navigate to /etc/xdg/lxsession/LXDE-pi/autostart
+
+  Add "@/usr/bin/python /home/pi/code/guitest.py" to the last line of the file.
+
+  Also since the script is pulling .png files from the images folder, the folder
+  needs to be put into the home directory (/home/pi/) since the script is being
+  run from there as well.

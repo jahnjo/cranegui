@@ -65,11 +65,16 @@ pitch = 0
 slewAngle = 0
 
 boomAngle = 0
-boomExtension = 0
+#This needs to be reset back to 0 when sensors are hooked up
+boomExtension = 26
+#4 ft offset when calculating the radius of hook from center of rotation
+centerRotOffset = 4
 
 POL = 10
+#Height of the crane body and plus the outriggers used to find HTip.
+heightBodyOR = 11.0833
 
-WisH = 0
+HTip = 0
 ACT = 0
 MAX = 0
 R = 0
@@ -83,7 +88,7 @@ backBoom = True
 polyColor = "green"
 
 root = Tk()
-root.overrideredirect(1)
+#root.overrideredirect(1)
 
 canvas = Canvas(root, bg="white", height=HEIGHT, width=WIDTH)
 canvas.pack()
@@ -91,6 +96,7 @@ canvas.pack()
 def getKeyboardInput():
     global debugMode
     global POL
+    global CWT
     device = InputDevice("/dev/input/event19")
     device.grab()
     for event in device.read_loop():
@@ -115,10 +121,29 @@ def getKeyboardInput():
                 POL = 0
             else:
                 POL -= 0.5
-        
+        elif event.code == ecodes.KEY_7:
+            CWT += 7500
+            if CWT > 30000:
+                CWT = -7500
+                
+
+def getRadiusFromCenter():
+    global R
+    angle = math.radians(boomAngle)
+    adjacent = boomExtension * math.cos(angle)
+    R = adjacent - centerRotOffset
+
+def getHeightTipBoom():
+    global HTip
+    angle = math.radians(boomAngle)
+    opposite = boomExtension * math.sin(angle)
+    HTip = opposite + heightBodyOR
+
 def populateRight():
+    getRadiusFromCenter()
+    getHeightTipBoom()
     canvas.create_text((750,38),fill="black",font="Courier 20",text=int(boomExtension))
-    canvas.create_text((750,100),fill="black",font="Courier 20",text=int(WisH))
+    canvas.create_text((750,100),fill="black",font="Courier 20",text=int(HTip))
     canvas.create_text((750,168),fill="black",font="Courier 20",text=int(ACT))
     canvas.create_text((750,242),fill="black",font="Courier 20",text=int(MAX))
     canvas.create_text((750,312),fill="black",font="Courier 20",text=int(R))
@@ -253,9 +278,9 @@ def depthCalc(midx, midy, points, roll, pitch):
              [0,0,0,0]
             ]
 
-    print np.matrix(orPos)
-    print "Roll " + str(roll)
-    print "Pitch " + str(pitch)
+    #print np.matrix(orPos)
+    #print "Roll " + str(roll)
+    #print "Pitch " + str(pitch)
 
     roZ = [[np.cos(np.radians(yaw)),-np.sin(np.radians(yaw)),0],
         [np.sin(np.radians(yaw)),np.cos(np.radians(yaw)),0],
@@ -281,7 +306,7 @@ def depthCalc(midx, midy, points, roll, pitch):
     newList.append(round(rotPos.item(10)/inchToPixel,2))
     newList.append(round(rotPos.item(11)/inchToPixel,2))
 
-    print newList
+    #print newList
 
     return newList
 
@@ -548,10 +573,10 @@ def clock():
     
 
     #50, running at 20 Hz
-    root.after(10000, clock) # run itself again after 50 ms
+    root.after(100, clock) # run itself again after 50 ms
 
-#userInputThread = threading.Thread(target=getKeyboardInput, args=())
-#userInputThread.start()
+userInputThread = threading.Thread(target=getKeyboardInput, args=())
+userInputThread.start()
 
 imageList = getImages()
 clock()
