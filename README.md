@@ -17,13 +17,21 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   
   ```sudo apt-get install libusb-1.0-0-dev```
   
+  Dependencies for gui.py
+  
+  Used for processing the images used on the right side of the GUI.
+  
   ```pip install Pillow (PIL, image processing)```
+  
+  Used to do the rotational matrices to calculate the depth.
   
   ```pip install numpy```
   
   check for usb devices: ```python -m evdev.evtest```
   
-  let all use event in device folder
+  Used to see all the event within /dev/input/
+  chmod used to change the permissions of the above folder
+  in order to not have to use sudo when running the script
   
   ```chmod a+rw /dev/input/event19```
 
