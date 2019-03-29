@@ -2,7 +2,7 @@
 
 In order to use Tkinter within python 2 run ```sudo apt-get install python-tkinter```
 
-Dependencies for Labjack
+Dependencies for Labjack:
 
 Files Needed:
 
@@ -15,15 +15,18 @@ exodriver-master [link for exodriver](https://labjack.com/support/software/insta
   -linux drivers for the labjack, which needs libusb. I downloaded libusb and libusb-devel from package manager as a    dependency.
   documention to install exodriver [here](https://labjack.com/support/software/installers/exodriver).
   
+  Libusb often has alot of various dependencies for itself and if apt-get doesn't resolve the dependencies, you must download
+  each individually, personally had issues with the jpeg library so watch out for that.
+  
   ```sudo apt-get install libusb-1.0-0-dev```
   
-  Dependencies for gui.py
+  Dependencies for gui.py:
   
-  Used for processing the images used on the right side of the GUI.
+  PIL is used for processing the images used on the right side of the GUI.
   
   ```pip install Pillow (PIL, image processing)```
   
-  Used to do the rotational matrices to calculate the depth.
+  Numpy is used to do the rotational matrices to calculate the depth.
   
   ```pip install numpy```
   
