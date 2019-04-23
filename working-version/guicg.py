@@ -15,7 +15,7 @@ import math
 import datetime
 import u6
 import threading
-#from evdev import InputDevice, categorize, ecodes
+from evdev import InputDevice, categorize, ecodes
 import numpy as np
 import time
 import mantis_parameters as mantis
@@ -48,11 +48,11 @@ weights_com = np.array([])
 weights_cog = np.array([])
 
 # points = np.array([leftSideframeCG, rightSideframeCG,
-#                     counterweightCG, boomCG, upperCG])
+#                    counterweightCG, boomCG, upperCG])
 com = [0,0,0,0]
 cog = [0,0,0,0]
 
-#DAQ = u6.U6()
+DAQ = u6.U6()
 
 
 WIDTH = 800
@@ -93,9 +93,9 @@ roll = 0
 pitch = 0
 slewAngle = 0
 
-boomAngle = 45
+boomAngle = 0
 #This needs to be reset back to 0 when sensors are hooked up
-boomExtension = 26
+boomExtension = 0
 #4 ft offset when calculating the radius of hook from center of rotation
 centerRotOffset = 4
 
@@ -132,33 +132,34 @@ def getKeyboardInput():
     global debugMode
     global POL
     global CWT
-    # device = InputDevice("/dev/input/event19")
-    # device.grab()
-    # for event in device.read_loop():
-    #     if event.code == ecodes.KEY_1:
-    #         print "debugMode True"
-    debugMode = True
-        # elif event.code == ecodes.KEY_5:
-        #     print "debugMode False"
-        #     debugMode = False
-        # elif event.code == ecodes.KEY_8:
-        #     print "Exiting userInputThread"
-        #     device.ungrab()
+    device = InputDevice("/dev/input/event19")
+    device.grab()
 
-        # if event.code == ecodes.KEY_2:
-        #     if POL > 10:
-        #         POL = 10
-        #     else:
-        #         POL += 0.5
-        # elif event.code == ecodes.KEY_6:
-        #     if POL < 0:
-        #         POL = 0
-        #     else:
-        #         POL -= 0.5
-        # elif event.code == ecodes.KEY_7:
-        #     CWT += 7500
-        #     if CWT > 30000:
-        #         CWT = -7500
+    for event in device.read_loop():
+        if event.code == ecodes.KEY_1:
+            print "debugMode True"
+            debugMode = True
+        elif event.code == ecodes.KEY_5:
+            print "debugMode False"
+            debugMode = False
+        elif event.code == ecodes.KEY_8:
+            print "Exiting userInputThread"
+            device.ungrab()
+
+        if event.code == ecodes.KEY_2:
+            if POL > 10:
+                POL = 10
+            else:
+                POL += 0.5
+        elif event.code == ecodes.KEY_6:
+            if POL < 0:
+                POL = 0
+            else:
+                POL -= 0.5
+        elif event.code == ecodes.KEY_7:
+            CWT += 7500
+            if CWT > 30000:
+                CWT = -7500
 
 '''
 Calculating CG values for x and y position
@@ -336,12 +337,24 @@ def getImages():
 
     return imageList
 
+'''
+calibrated for generic 5v output from -20:20
 def calibrateIncline(incline):
     calibratedVal = (incline / 0.125) - 20
     if calibratedVal < -20:
         calibratedVal = -20
     elif calibratedVal > 20:
         calibratedVal = 20
+    return calibratedVal
+'''
+
+def calibrateIncline(incline):
+    #accounts for the fact that the output ranges from 0.5v-4.5v
+    calibratedVal = (incline / 0.08) - 31.25
+    if calibratedVal < -25:
+        calibratedVal = -25
+    elif calibratedVal > 25:
+        calibratedVal = 25
     return calibratedVal
 
 def calibrateOutrigger(outriggerPos):
@@ -653,14 +666,14 @@ def rotateAndDraw(slewAngle, basePoints, pitch, roll, midx, midy, boomAngle, boo
     pointsCalc()
 
     com = c_o_m()
-    print(com)
+    #print(com)
     com[0] += CANVAS_MID_X + 8
     com[1] += CANVAS_MID_Y
     canvas.create_oval(com[0], com[1], com[0]+5, com[1]+5, fill="green")
     #predicted_path(midx, midy, newSquare, roll, pitch)
 
     cog = c_o_g()
-    print(cog)
+    #print(cog)
     cog[0] += CANVAS_MID_X + 8
     cog[1] += CANVAS_MID_Y
     canvas.create_oval(cog[0], cog[1], cog[0]+5, cog[1]+5, fill="blue")
@@ -721,11 +734,11 @@ def clock():
     #all increment functions simulate sensor input
     #incrementDeg()
     #incrementOr()
-    incrementInclineX()
-    incrementInclineY()
+    #incrementInclineX()
+    #incrementInclineY()
     #incrementBoomAngle()
 
-    '''
+    
     test0 = DAQ.getAIN(0)
     test1 = DAQ.getAIN(1)
     test2 = DAQ.getAIN(2)
@@ -741,7 +754,7 @@ def clock():
     slewAngle = calibrateSlewAngle(test0)
     boomExtension = calibrateBoomExtension(test1)
     boomAngle = calibrateBoomAngle(test2)
-    '''
+    
 
     drawingPts = sensorInput(craneLength, craneWidth, CANVAS_MID_X, CANVAS_MID_Y, outriggerExtRight, outriggerExtLeft, pitch, roll)   
     rotateAndDraw(slewAngle, drawingPts, pitch, roll, CANVAS_MID_X, CANVAS_MID_Y, boomAngle, boomExtension)
@@ -751,9 +764,6 @@ def clock():
     
     #50, running at 20 
     root.after(100, clock) # run itself again after 50 ms
-    #end = time.time()
-    #freq = end - start
-    #print "Update time = " + str(freq) + " seconds"
     
 
 #userInputThread = threading.Thread(target=getKeyboardInput, args=())

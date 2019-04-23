@@ -24,7 +24,7 @@ debugMode = True
 
 
 
-#DAQ = u6.U6()
+DAQ = u6.U6()
 
 
 WIDTH = 800
@@ -185,12 +185,24 @@ def getImages():
 
     return imageList
 
+'''
+calibrated for generic 5v output from -20:20
 def calibrateIncline(incline):
     calibratedVal = (incline / 0.125) - 20
     if calibratedVal < -20:
         calibratedVal = -20
     elif calibratedVal > 20:
         calibratedVal = 20
+    return calibratedVal
+'''
+
+def calibrateIncline(incline):
+    #accounts for the fact that the output ranges from 0.5v-4.5v
+    calibratedVal = (incline / 0.08) - 31.25
+    if calibratedVal < -25:
+        calibratedVal = -25
+    elif calibratedVal > 25:
+        calibratedVal = 25
     return calibratedVal
 
 def calibrateOutrigger(outriggerPos):
@@ -537,7 +549,6 @@ def rotateAndDraw(slewAngle, basePoints, pitch, roll, midx, midy, boomAngle, boo
     populateRight()
     
 def clock():
-    start = time.time()
     global pitch
     global roll
     global outriggerExtLeft
@@ -548,11 +559,11 @@ def clock():
     #all increment functions simulate sensor input
     #incrementDeg()
     #incrementOr()
-    incrementInclineX()
+    #incrementInclineX()
     #incrementInclineY()
     #incrementBoomAngle()
 
-    '''
+    
     test0 = DAQ.getAIN(0)
     test1 = DAQ.getAIN(1)
     test2 = DAQ.getAIN(2)
@@ -568,7 +579,7 @@ def clock():
     slewAngle = calibrateSlewAngle(test0)
     boomExtension = calibrateBoomExtension(test1)
     boomAngle = calibrateBoomAngle(test2)
-    '''
+    
 
     drawingPts = sensorInput(craneLength, craneWidth, CANVAS_MID_X, CANVAS_MID_Y, outriggerExtRight, outriggerExtLeft, pitch, roll)   
     rotateAndDraw(slewAngle, drawingPts, pitch, roll, CANVAS_MID_X, CANVAS_MID_Y, boomAngle, boomExtension)
@@ -578,9 +589,6 @@ def clock():
     
     #50, running at 20 
     root.after(100, clock) # run itself again after 50 ms
-    #end = time.time()
-    #freq = end - start
-    #print "Update time = " + str(freq) + " seconds"
     
 
 #userInputThread = threading.Thread(target=getKeyboardInput, args=())
