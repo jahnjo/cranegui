@@ -17,7 +17,6 @@ import u6
 import threading
 from evdev import InputDevice, categorize, ecodes
 import numpy as np
-import time
 
 
 debugMode = True
@@ -88,9 +87,8 @@ backIncY = True
 backBoom = True
 polyColor = "green"
 
-
 root = Tk()
-#Used to remove the titlebar from GUI
+#This completely removes the ability to close the screen and removed the titlebar
 #root.overrideredirect(1)
 
 canvas = Canvas(root, bg="white", height=HEIGHT, width=WIDTH)
@@ -129,7 +127,6 @@ def getKeyboardInput():
             if CWT > 30000:
                 CWT = -7500
                 
-
 def getRadiusFromCenter():
     global R
     angle = math.radians(boomAngle)
@@ -261,10 +258,10 @@ def colors(number):
 #based on outrigger pos and inclinometer x/y.
 def sensorInput(craneLength, craneWidth, midx, midy, orExtR, orExtL, pitch, roll):
     vertices = [
-        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) - (pitch*1), CANVAS_MID_Y - craneLength/2 + (roll*1)],
-        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) + (pitch*1), CANVAS_MID_Y - craneLength/2 - (roll*1)],
-        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) - (pitch*1), CANVAS_MID_Y + craneLength/2 + (roll*1)],
-        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) + (pitch*1), CANVAS_MID_Y + craneLength/2 - (roll*1)],
+        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) - (pitch*2), CANVAS_MID_Y - craneLength/2 + (roll*2)],
+        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) + (pitch*2), CANVAS_MID_Y - craneLength/2 - (roll*2)],
+        [CANVAS_MID_X + craneWidth/2 + (orExtR*inchToPixel) - (pitch*2), CANVAS_MID_Y + craneLength/2 + (roll*2)],
+        [CANVAS_MID_X - craneWidth/2 - (orExtL*inchToPixel) + (pitch*2), CANVAS_MID_Y + craneLength/2 - (roll*2)],
     ]
     #print vertices
     #print CANVAS_MID_X
@@ -525,10 +522,10 @@ def rotateAndDraw(slewAngle, basePoints, pitch, roll, midx, midy, boomAngle, boo
         canvas.create_text((43,170),fill="black",font="Courier 20",text="LOL")
 
     #draw corner numbers either , 1-4, or incline values (still under dev)
-    canvas.create_text(cornerPts[0],fill=colorY,font="Courier 15",text=str(int(depthPoints[0])))
-    canvas.create_text(cornerPts[1],fill=colorX,font="Courier 15",text=str(int(depthPoints[1])))
-    canvas.create_text(cornerPts[2],fill=colorX,font="Courier 15",text=str(int(depthPoints[2])))
-    canvas.create_text(cornerPts[3],fill=colorY,font="Courier 15",text=str(int(depthPoints[3])))
+    canvas.create_text(cornerPts[0],fill=colorY,font="Courier 15",text=str(depthPoints[0]))
+    canvas.create_text(cornerPts[1],fill=colorX,font="Courier 15",text=str(depthPoints[1]))
+    canvas.create_text(cornerPts[2],fill=colorX,font="Courier 15",text=str(depthPoints[2]))
+    canvas.create_text(cornerPts[3],fill=colorY,font="Courier 15",text=str(depthPoints[3]))
 
     #draw boom arm
     staticBoomArm = adjustBoom(midx, midy, boomAngle,boomExtension)
@@ -537,7 +534,6 @@ def rotateAndDraw(slewAngle, basePoints, pitch, roll, midx, midy, boomAngle, boo
     populateRight()
     
 def clock():
-    start = time.time()
     global pitch
     global roll
     global outriggerExtLeft
@@ -548,7 +544,7 @@ def clock():
     #all increment functions simulate sensor input
     #incrementDeg()
     #incrementOr()
-    incrementInclineX()
+    #incrementInclineX()
     #incrementInclineY()
     #incrementBoomAngle()
 
@@ -575,19 +571,13 @@ def clock():
 
     
     
-    
-    #50, running at 20 
-    root.after(100, clock) # run itself again after 50 ms
-    #end = time.time()
-    #freq = end - start
-    #print "Update time = " + str(freq) + " seconds"
-    
 
-#userInputThread = threading.Thread(target=getKeyboardInput, args=())
-#userInputThread.start()
+    #50, running at 20 Hz
+    root.after(100, clock) # run itself again after 50 ms
+
+userInputThread = threading.Thread(target=getKeyboardInput, args=())
+userInputThread.start()
 
 imageList = getImages()
-
 clock()
-
 root.mainloop()
