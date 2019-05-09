@@ -3,6 +3,10 @@
 USAGE: working-version/guicg.py is the most current version of the software and there is an even newer version on the pi itself that was 
 running at the design expo that has the all the auto boot up functionality correct.
 
+Notes: since the code is being run from the home directory via the pi autostart scripts the /images/ folder had to be placed in the home
+directory as well so that the code can access it from there since the image processing portion of the code expects the folder to be in
+the same directory as the script. 
+
 In order to use Tkinter within python 2 run ```sudo apt-get install python-tkinter```
 
 Dependencies for Labjack:
