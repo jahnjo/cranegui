@@ -1,5 +1,8 @@
 # cranegui
 
+USAGE: working-version/guicg.py is the most current version of the software and there is an even newer version on the pi itself that was 
+running at the design expo that has the all the auto boot up functionality correct.
+
 In order to use Tkinter within python 2 run ```sudo apt-get install python-tkinter```
 
 Dependencies for Labjack:
