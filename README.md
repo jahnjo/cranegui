@@ -1,5 +1,7 @@
 # cranegui
 
+email fosterj5@vcu.edu if explanation needed.
+
 USAGE: working-version/guicg.py is the most current version of the software and there is an even newer version on the pi itself that was 
 running at the design expo that has the all the auto boot up functionality correct.
 
